@@ -1,5 +1,6 @@
 package last.first.hudlu;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,11 +9,13 @@ import android.widget.TextView;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
+    private OnAdapterInteractionListener mListener;
     private String[] mDataset;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(String[] myDataset) {
+    public MyAdapter(Context context, String[] myDataset) {
         mDataset = myDataset;
+        mListener = (OnAdapterInteractionListener) context;
     }
 
     @Override
@@ -23,8 +26,14 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
         holder.mMyText.setText(mDataset[position]);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onItemClicked(v, position);
+            }
+        });
     }
 
     @Override
@@ -40,6 +49,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
             super(v);
             mMyText = (TextView) v.findViewById(R.id.item_my_text);
         }
+    }
+
+    public interface OnAdapterInteractionListener {
+        void onItemClicked(View view, int position);
     }
 
 }
