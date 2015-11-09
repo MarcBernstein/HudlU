@@ -16,6 +16,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.util.List;
+
 import last.first.hudlu.models.MashableNews;
 import last.first.hudlu.models.MashableNewsItem;
 
@@ -24,10 +26,10 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     private final RequestQueue mRequestQueue;
     private OnAdapterInteractionListener mListener;
-    private MashableNewsItem[] mDataset;
+    private List<MashableNewsItem> mDataset;
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public MyAdapter(Context context, MashableNewsItem[] myDataset) {
+    public MyAdapter(Context context, List<MashableNewsItem> myDataset) {
         mDataset = myDataset;
         mListener = (OnAdapterInteractionListener) context;
         mRequestQueue = Volley.newRequestQueue(context);
@@ -42,7 +44,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        MashableNewsItem mashableNewsItem = mDataset[position];
+        MashableNewsItem mashableNewsItem = mDataset.get(position);
         holder.mTitleText.setText(mashableNewsItem.title);
         holder.mAuthorText.setText(mashableNewsItem.author);
 
@@ -68,9 +70,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
 
     @Override
     public int getItemCount() {
-        return mDataset.length;
+        return mDataset.size();
     }
-
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
         TextView mTitleText;

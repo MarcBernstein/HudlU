@@ -26,6 +26,9 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import last.first.hudlu.models.MashableNews;
 import last.first.hudlu.models.MashableNewsItem;
 
@@ -33,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
     private static final String TAG = MainActivity.class.getName();
     private static final String MASHABLE_URL = "http://mashable.com/stories.json?hot_per_page=0&new_per_page=5&rising_per_page=0";
 
-    private MashableNewsItem[] myDataset;
+    private List<MashableNewsItem> myDataset = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -52,6 +55,10 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // specify an adapter (see also next example)
+        mAdapter = new MyAdapter(this, myDataset);
+        mRecyclerView.setAdapter(mAdapter);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -93,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
 
     @Override
     public void onItemClicked(View view, int position) {
-        String url = myDataset[position].link;
+        String url = myDataset.get(position).link;
         Intent browserIntent = new Intent(Intent.ACTION_VIEW);
         browserIntent.setData(Uri.parse(url));
         startActivity(browserIntent);
@@ -113,10 +120,9 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
                 @Override
                 public void onResponse(String response) {
                     MashableNews mashableNews = new Gson().fromJson(response, MashableNews.class);
-                    Log.d(TAG, String.format("First title %s", mashableNews.newsItems[0].title));
-                    myDataset = mashableNews.newsItems;
-                    mAdapter = new MyAdapter(MainActivity.this, mashableNews.newsItems);
-                    mRecyclerView.setAdapter(mAdapter);
+                    Log.d(TAG, String.format("First title %s", mashableNews.newsItems.get(0).title));
+                    myDataset.addAll(mashableNews.newsItems);
+                    mAdapter.notifyDataSetChanged();
                 }
             }, new Response.ErrorListener() {
                 @Override
