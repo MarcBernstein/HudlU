@@ -100,10 +100,7 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
 
     @Override
     public void onItemClicked(View view, int position) {
-        String url = myDataset.get(position).link;
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW);
-        browserIntent.setData(Uri.parse(url));
-        startActivity(browserIntent);
+        Snackbar.make(view, myDataset.get(position).author, Snackbar.LENGTH_SHORT).show();
     }
 
     private void fetchLatestNews() {
