@@ -1,13 +1,14 @@
 package last.first.hudlu;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -35,11 +36,15 @@ import last.first.hudlu.models.MashableNewsItem;
 public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapterInteractionListener {
     private static final String TAG = MainActivity.class.getName();
     private static final String MASHABLE_URL = "http://mashable.com/stories.json?hot_per_page=0&new_per_page=5&rising_per_page=0";
+    private static final String SHARED_PREFS = "hudlu_prefs";
+    private static final String SHARED_PREFS_FIRST_START = "hudlu_prefs_first_start";
 
     private List<MashableNewsItem> myDataset = new ArrayList<>();
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +68,25 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        if(sharedPreferences.getBoolean(SHARED_PREFS_FIRST_START, true)) {
+            sharedPreferences.edit().putBoolean(SHARED_PREFS_FIRST_START, false).apply();
+            showFirstRunDialog();
+        }
 
         fetchLatestNews();
+    }
+
+    private void showFirstRunDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Welcome to Homework 4")
+                .setMessage("This is showing because its the first homework 4 has been run!")
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -90,8 +104,9 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Log.d("HudlU", "Settings menu item clicked.");
+        if (id == R.id.action_favorites) {
+            Intent intent = new Intent(this, FavoritesActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -100,7 +115,9 @@ public class MainActivity extends AppCompatActivity implements MyAdapter.OnAdapt
 
     @Override
     public void onItemClicked(View view, int position) {
-        Snackbar.make(view, myDataset.get(position).author, Snackbar.LENGTH_SHORT).show();
+        MashableNewsItem item = myDataset.get(position);
+        Intent browserIntent = new Intent("android.intent.action.VIEW", Uri.parse(item.link));
+        startActivity(browserIntent);
     }
 
     private void fetchLatestNews() {
