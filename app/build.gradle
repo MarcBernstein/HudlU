@@ -32,4 +32,7 @@ dependencies {
     // Class 4
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.mcxiaoke.volley:library:1.0.19'
+
+    // Class 3
+    compile 'io.realm:realm-android:0.85.0'
 }
